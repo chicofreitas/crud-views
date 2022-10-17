@@ -2,7 +2,10 @@
 
 namespace Chicofreitas\CrudViews;
 
-use Chicofreitas\CrudViews\Commands\MakeViewCommand;
+use Chicofreitas\CrudViews\Commands\MakeIndexViewCommand;
+use Chicofreitas\CrudViews\Commands\MakeCreateViewCommand;
+use Chicofreitas\CrudViews\Commands\MakeEditViewCommand;
+use Chicofreitas\CrudViews\Commands\MakeShowViewCommand;
 use Illuminate\Support\ServiceProvider;
 
 class CrudViewsServiceProvider extends ServiceProvider
@@ -15,7 +18,10 @@ class CrudViewsServiceProvider extends ServiceProvider
 
         if($this->app->runningInConsole()){
             $this->commands([
-                MakeViewCommand::class,
+                MakeIndexViewCommand::class,
+                MakeCreateViewCommand::class,
+                MakeEditViewCommand::class,
+                MakeShowViewCommand::class,
             ]);
         }
     }    

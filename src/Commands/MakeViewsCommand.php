@@ -6,7 +6,7 @@ use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 use ReflectionClass;
 
-class MakeViewCommand extends Command
+class MakeViewsCommand extends Command
 {
     /**
      * The name and signature of the console command.
@@ -42,9 +42,15 @@ class MakeViewCommand extends Command
 
     /**
      * 
-     * @var Array.
+     * @var Array
      */
     protected $fillables;
+
+    /**
+     * 
+     * @var Array
+     */
+    protected $views = ['index', 'create', 'show', 'edit'];
     
     /**
      * Create a new command instance.
@@ -56,25 +62,6 @@ class MakeViewCommand extends Command
         parent::__construct();
 
         $this->files = $files;
-    }
-    /**
-     * 
-     */
-    public function handle()
-    {
-        $this->fire();
-    }
-
-    /**
-     * 
-     */
-    protected function fire()
-    {
-        $this->model = $this->argument('model');
-
-        $this->fillables = $this->getModelFillables();
-
-        $this->makeTemplates();
     }
 
     /**
@@ -89,20 +76,6 @@ class MakeViewCommand extends Command
         $propertires = $reflector->getDefaultProperties();
         
         return $propertires['fillable'];
-    }
-
-    /**
-     * 
-     * 
-     */
-    protected function makeTemplates()
-    {
-
-        if (!$this->files->exists($path = $this->getPath('index'))) {        
-            $this->makeModelDirectory($path);
-        }
-
-        $this->compileTemplates($path);
     }
 
     /**
@@ -122,24 +95,5 @@ class MakeViewCommand extends Command
     {
         $this->files->makeDirectory(dirname($path), 0777, true, true);
     }
-
-    protected function compileTemplates($path)
-    {
-        $fp = fopen($path, "x+");
     
-            
-        foreach($this->fillables as $fillable):
-            echo $fillable . "\n";
-            $line = <<<blade
-
-<div class="">
-    <p> {$fillable}: {{ \${$this->model}->{$fillable} }}</p>
-</div>
-
-blade;
-
-            fwrite($fp, $line);
-
-        endforeach;
-    }
 }

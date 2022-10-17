@@ -1,0 +1,15 @@
+<x-dashboard>
+
+    <x-slot:styles>
+    </x-slot>
+
+    <x-slot:header>
+        {model}
+    </x-slot>
+
+    <x-{model}>
+
+    <x-slot:scripts>
+    <x-slot>
+
+</x-dashboard>
