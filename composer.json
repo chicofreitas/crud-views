@@ -3,7 +3,6 @@
     "description": "Generates CRUD views for Eloquent Models.",
     "type": "library",
     "require": {
-        "phpunit/phpunit": "10.0.x-dev"
     },
     "license": "MIT",
     "autoload": {
