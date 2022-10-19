@@ -3,10 +3,10 @@
 namespace Chicofreitas\CrudViews\Commands;
 
 use Chicofreitas\CrudViews\Commands\MakeViewsCommand;
+use Illuminate\Support\Str;
 
 class MakeIndexViewCommand extends MakeViewsCommand
 {
-    
     /**
      * The name and signature of the console command.
      *
@@ -41,162 +41,115 @@ class MakeIndexViewCommand extends MakeViewsCommand
     }
 
     /**
+     * Generate the index view for a desired user.
      * 
-     * 
+     * @return string
      */
     protected function makeTemplate()
     {
-        $this->info("Creating the {$this->method}.blade.php for {$this->model} model.");
+        $this->line("Creating the {$this->method}.blade.php for {$this->model} model.");
 
-        if (!$this->files->exists($path = $this->getPath($this->method))) {        
-            $this->makeModelDirectory($path);
-            $this->compileTemplate($path);
+        if ($this->files->exists($path = $this->getPath($this->method))) {        
+            return $this->error("{$this->method} já existe!");
         }
+        
+        $this->makeModelDirectory($path);
+
+        $this->files->put($path, $this->compileViewStub());
 
         $this->info("View {$this->method}.blade.php created.");
     }
 
+
+    public function compileViewStub()
+    {
+        $stub = $this->files->get(__DIR__ . '/../stubs/index.stub');
+
+        $this->replaceModelsName($stub)
+            ->replaceModelName($stub)
+            ->replaceTableHeadings($stub)
+            ->replaceTableRows($stub)
+            ->replaceUcModelsName($stub);
+
+        return $stub;
+    }
+
+    /**
+     * Replace the model name in the stub.
+     *
+     * @param  string $stub
+     * @return $this
+     */
+    protected function replaceModelName(&$stub)
+    {
+        $modelName = $this->argument('model');
+
+        $stub = str_replace('{{model}}', $modelName, $stub);
+
+        return $this;
+    }
+
+    /**
+     * Replace the model name in the stub.
+     *
+     * @param  string $stub
+     * @return $this
+     */
+    protected function replaceUcModelsName(&$stub)
+    {
+        $ucModelsName = ucfirst(Str::pluralStudly($this->argument('model')));
+
+        $stub = str_replace('{{ucModelsName}}', $ucModelsName, $stub);
+
+        return $this;
+    }
+
+     /**
+     * Replace the model name in the stub.
+     *
+     * @param  string $stub
+     * @return $this
+     */
+    protected function replaceModelsName(&$stub)
+    {
+        $modelsName = Str::pluralStudly(Str::camel($this->argument('model')));
+
+        $stub = str_replace('{{models}}', $modelsName, $stub);
+
+        return $this;
+    }
+
     /**
      * 
-     * @todo refatorar este elefante..
-     * 
-     * @var String $path
      */
-    public function compileTemplate($path)
-    {
-        $bar = $this->output->createProgressBar(count($this->fillables));
+    public function replaceTableHeadings(&$stub)
+    {   
+        $tableHeadings = "";
 
-        $fp = fopen($path, "x+");
-        
-        $bar->start();
-
-        fwrite($fp, $this->openTable());
-        fwrite($fp, $this->openHead());
-        
         foreach($this->fillables as $fillable):
 
-            $line = <<<blade
-        
-                <td>{$fillable}<td>
-
-blade;
-        
-            fwrite($fp, $line);
+            $tableHeadings .= "<td>{$fillable}<td>\n";
 
         endforeach;
 
-        fwrite($fp, $this->closeHead());
-        fwrite($fp, $this->openBody());
+        $stub = str_replace('{{tableHeadings}}', $tableHeadings, $stub);
+
+        return $this;
+    }
+
+    public function replaceTableRows(&$stub)
+    {
+        $tableRows = "";
 
         foreach($this->fillables as $fillable):
         
-            $table_body = <<<blade
-
-                <td>{{ \${$this->model}->{$fillable} }}</td>
-
-blade;
-            fwrite($fp, $table_body);
+            $tableRows .= "<td>{{ \${$this->model}->{$fillable} }}</td>\n";
+            
         endforeach;
 
-        fwrite($fp, $this->closeBody());
+        $stub = str_replace('{{tableRows}}', $tableRows, $stub);
 
-        fwrite($fp, $this->closeTable());
-
-        $bar->advance();
-
-        fclose($fp);
-
-        $bar->finish();
-
-        $this->newLine(2);
-    }
-
-    /**
-     * 
-     * @return String
-     */
-    protected function openTable()
-    {
-        return <<<blade
-<div class="">
-
-    <table id="{$this->model}_table">
-
-blade;
-    }
-
-    /**
-     * 
-     * @return String
-     */
-    protected function closeTable()
-    {
-        return <<<blade
-
-    </table>
-
-</div>
-
-blade;
-    }
-
-    /**
-     * 
-     * @return String
-     */
-    public function openHead()
-    {
-        return <<<blade
-        
-        <thead>
-
-            <th>
-blade;
-    }
-
-    /**
-     * 
-     * @return String
-     */
-    public function closeHead()
-    {
-        return <<<blade
-
-            </th>
-
-        </thead>
-blade;
-    }
-
-    /**
-     * 
-     * @return String
-     */
-    protected function openBody()
-    {
-        return <<<blade
-
-        <tbody>
-
-            @foreach( \${$this->model} as \${$this->model})
-            <tr>
-
-blade;
-    }
-
-    /**
-     * 
-     * @return String
-     */
-    protected function closeBody()
-    {
-        return <<<blade
-            </tr>
-            @endforeach
-
-        </tbody>
-
-blade;
+        return $this;
     }
 
 }
