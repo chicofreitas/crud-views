@@ -1,5 +1,7 @@
 # Crud Views
 
+Welcome to my Laravel Package
+
 Add the crud-views repository in your __composer.json__
 
     "repositories": [
