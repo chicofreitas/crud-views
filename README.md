@@ -9,6 +9,22 @@ Add the crud-views repository in your __composer.json__
         }
     ],
 
+add the package into the require section
+
+    "require": {
+        ...
+        "chicofreitas/crud-views" : "v0.0.1"
+    },
+
+and, in the psr-4 
+
+    "autoload": {
+        "psr-4": {
+            ...
+            "Chicofreitas\\" : "src/"
+        }
+    },
+
 
 Add the following line to __composer.json__ file located in the root of Laravel application
 
