@@ -1,5 +1,15 @@
 # Crud Views
 
+Add the crud-views repository in your __composer.json__
+
+    "repositories": [
+        {
+            "type" : "vcs",
+            "url" : "https://github.com/chicofreitas/crud-views"
+        }
+    ],
+
+
 Add the following line to __composer.json__ file located in the root of Laravel application
 
     "autoload": {
